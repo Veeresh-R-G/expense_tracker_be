@@ -28,7 +28,6 @@ type service struct {
 	db *mongo.Client
 }
 
-var Collection_New_Login *mongo.Collection
 var Collection_Main *mongo.Collection
 
 var (
@@ -50,7 +49,6 @@ func New() Service {
 		log.Fatal(err)
 
 	}
-	Collection_New_Login = client.Database(DB_NAME).Collection(DB_NEW_USERS)
 	Collection_Main = client.Database(DB_NAME).Collection(DB_MAIN)
 	return &service{
 		db: client,
