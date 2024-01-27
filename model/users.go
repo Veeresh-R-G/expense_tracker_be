@@ -1,8 +1,10 @@
 package model
 
 type Users struct {
+	ID        string `json:"_id,omitempty" bson:"_id,omitempty"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
+	Email     string `json:"email"`
 	Total_Amt []struct {
 		Month            string `json:"month"`
 		Year             string `json:"year"`
