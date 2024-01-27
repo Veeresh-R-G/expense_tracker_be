@@ -14,9 +14,23 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/health", s.healthHandler)
 	r.GET("/users", s.HelloUsers)
 	r.GET("/getAllUsers", s.FindAllUsers)
+	r.PATCH("/update/totalAmout", s.UpdateAmout)
 	r.POST("/add", s.AddUser)
+	r.PATCH("/update/dailySpends", s.UpdateDailySpends)
 
 	return r
+}
+
+func (s *Server) UpdateDailySpends(c *gin.Context) {
+	var User model.Users
+	c.BindJSON(&User)
+	s.db.UpdateDailySpends(&User, c)
+}
+
+func (s *Server) UpdateAmout(c *gin.Context) {
+	var User model.Users
+	c.BindJSON(&User)
+	s.db.UpdateTotalAmount(&User, c)
 }
 
 func (s *Server) FindAllUsers(c *gin.Context) {

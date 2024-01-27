@@ -17,6 +17,8 @@ import (
 )
 
 type Service interface {
+	UpdateDailySpends(User *model.Users, c *gin.Context)
+	UpdateTotalAmount(User *model.Users, c *gin.Context)
 	InsertUser(User model.Users, c *gin.Context)
 	GetUsers(c *gin.Context) map[string]interface{}
 	Health() map[string]string
@@ -118,4 +120,60 @@ func (s *service) GetUsers(c *gin.Context) map[string]interface{} {
 	return map[string]interface{}{
 		"users": users,
 	}
+}
+
+func (s *service) UpdateTotalAmount(User *model.Users, c *gin.Context) {
+
+	var tempUser model.Users
+	err := Collection_Main.FindOne(context.TODO(), bson.M{"email": User.Email}).Decode(&tempUser)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "User Not Found"})
+	}
+
+	filter := bson.D{{Key: "email", Value: User.Email}}
+	newTotalAmount := append(tempUser.Total_Amt, User.Total_Amt...)
+	fmt.Printf("new%+v", newTotalAmount)
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "total_amt", Value: newTotalAmount}}}}
+
+	_, err = Collection_Main.UpdateOne(context.TODO(), filter, update)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Error in updating total amount"})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Total amount updated successfully",
+	})
+
+}
+
+func (s *service) UpdateDailySpends(User *model.Users, c *gin.Context) {
+
+	var tempUser model.Users
+	err := Collection_Main.FindOne(context.TODO(), bson.M{"email": User.Email}).Decode(&tempUser)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "User Not Found"})
+	}
+
+	filter := bson.D{{Key: "email", Value: User.Email}}
+	newSpends := append(tempUser.Spends, User.Spends...)
+	fmt.Printf("new%+v", newSpends)
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "spends", Value: newSpends}}}}
+
+	_, err = Collection_Main.UpdateOne(context.TODO(), filter, update)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Error in updating daily spends"})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Daily spends updated successfully",
+	})
+
 }

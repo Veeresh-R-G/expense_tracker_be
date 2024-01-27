@@ -9,11 +9,11 @@ type Users struct {
 		Month            string `json:"month"`
 		Year             string `json:"year"`
 		Amount_Threshold int    `json:"amount"`
-	}
+	} `json:"total_amt"`
 	Spends []struct {
 		Date         string `json:"date"`
 		Month        string `json:"month"`
 		Year         string `json:"year"`
 		Amount_Spent int    `json:"amount_spent"`
-	}
+	} `json:"spends"`
 }
