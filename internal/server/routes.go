@@ -8,17 +8,45 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
+
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
+	r.Use(corsMiddleware())
 	r.GET("/", s.HelloWorldHandler)
 	r.GET("/health", s.healthHandler)
-	r.GET("/users", s.HelloUsers)
 	r.GET("/getAllUsers", s.FindAllUsers)
-	r.PATCH("/update/totalAmout", s.UpdateAmout)
+	r.GET("/getUser/:id", s.FindUserbyUUID)
 	r.POST("/add", s.AddUser)
+	r.POST("/login", s.Login)
 	r.PATCH("/update/dailySpends", s.UpdateDailySpends)
+	r.PATCH("/update/totalAmout", s.UpdateAmout)
 
 	return r
+}
+
+func (s *Server) FindUserbyUUID(c *gin.Context) {
+	id := c.Param("id")
+	s.db.GetUserbyUUID(id, c)
+}
+
+func (s *Server) Login(c *gin.Context) {
+	var User model.Users
+	c.BindJSON(&User)
+	s.db.LoginUser(User, c)
 }
 
 func (s *Server) UpdateDailySpends(c *gin.Context) {

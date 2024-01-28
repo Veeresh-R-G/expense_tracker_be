@@ -2,6 +2,7 @@ package model
 
 type Users struct {
 	ID        string `json:"_id,omitempty" bson:"_id,omitempty"`
+	UUID      string `json:"uuid"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Email     string `json:"email"`
@@ -15,5 +16,6 @@ type Users struct {
 		Month        string `json:"month"`
 		Year         string `json:"year"`
 		Amount_Spent int    `json:"amount_spent"`
+		Description  string `json:"desc"`
 	} `json:"spends"`
 }
