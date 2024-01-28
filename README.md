@@ -4,13 +4,8 @@ The repository contains the backend code for Expensify
 
 ### To Do
 
-- Revise JWT sessions
-- Implement JWT in Go
-- Start Integrating with Frontend
-
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+- Implement JWT 
+- Done with the frontend Integrations
 
 ## MakeFile
 
