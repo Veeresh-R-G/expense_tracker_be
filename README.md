@@ -2,10 +2,15 @@
 
 The repository contains the backend code for Expensify
 
+### Finished Tasks
+
+- Finished Implementing the Bearer Token method of JWT ✅
+
 ### To Do
 
-- Implement JWT 
-- Done with the frontend Integrations
+- Integrate this method of Access on the frontend
+- FrontEnd home page (Keep it Simple)
+- Protect the APIs using this
 
 ## MakeFile
 
