@@ -5,6 +5,7 @@ The repository contains the backend code for Expensify
 ### Finished Tasks
 
 - Finished Implementing the Bearer Token method of JWT ✅
+- Current Implementation is Using the concept of bearer token, can also implement it using cookie setting
 
 ### To Do
 
@@ -61,3 +62,10 @@ clean up binary from the last build
 ```bash
 make clean
 ```
+
+
+
+#### Resources | Referred 
+- [JWT - 1](https://seefnasrul.medium.com/create-your-first-go-rest-api-with-jwt-authentication-in-gin-framework-dbe5bda72817)
+- [JWT - 2](https://medium.com/@cheickzida/golang-implementing-jwt-token-authentication-bba9bfd84d60)
+- Chat Gpt
