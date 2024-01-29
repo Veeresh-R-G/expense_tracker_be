@@ -3,6 +3,7 @@ package server
 import (
 	"backend/model"
 	helper "backend/utils"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -39,6 +40,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 }
 
 func (s *Server) FindUserbyUUID(c *gin.Context) {
+	tokenString, exists := c.Request.Header["Authorization"]
+	if !exists || len(tokenString) == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not found"})
+		return
+	}
+
+	fmt.Println(tokenString)
+	// tokenString = tokenString[len("Bearer "):]
+	fmt.Println(tokenString)
+
 	id := c.Param("id")
 	s.db.GetUserbyUUID(id, c)
 }

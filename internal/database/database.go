@@ -2,6 +2,7 @@ package database
 
 import (
 	"backend/model"
+	"backend/utils"
 	"context"
 	"fmt"
 	"log"
@@ -15,6 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
@@ -83,12 +85,25 @@ func (s *service) LoginUser(User model.Users, c *gin.Context) {
 		return
 	}
 
-	if User.Password != temp.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Invalid Password"})
+	err = bcrypt.CompareHashAndPassword([]byte(temp.Password), []byte(User.Password))
 
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Invalid Credentials",
+		})
 		return
 	}
+
+	token, err := utils.CreateToken(temp.Username, temp.UUID)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Couldn't create Tokens",
+		})
+	}
+
+	c.Header("Authorization", "Bearer "+token)
+	c.Set("token", token)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User Logged In Successfully",
@@ -101,27 +116,41 @@ func (s *service) InsertUser(User model.Users, c *gin.Context) {
 	var temp model.Users
 	filter := bson.D{{Key: "email", Value: User.Email}}
 	err := Collection_Main.FindOne(context.TODO(), filter).Decode(&temp)
-
+	fmt.Println("Here I am")
 	if err == nil {
 		c.JSON(http.StatusAlreadyReported, gin.H{
 			"message": "User already exists",
 		})
 		return
 	}
+	fmt.Println("Here I am")
 
 	filter = bson.D{{Key: "username", Value: User.Username}}
 	err = Collection_Main.FindOne(context.TODO(), filter).Decode(&temp)
-
+	fmt.Println("Here I am")
 	if err == nil {
 		c.JSON(http.StatusAlreadyReported, gin.H{
-			"message": "User already exists, Username already Taken",
+			"message": "Username already Taken!!",
 		})
 		return
 	}
+	fmt.Println("Here I am")
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(User.Password), bcrypt.DefaultCost)
+	fmt.Println("Here I am")
+	if err != nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"message": "Error in Password Hashing",
+		})
+		return
+	}
+	fmt.Println("Here I am")
 	User.UUID = uuid.NewString()
+	User.Password = string(hashedPassword)
+
+	fmt.Printf("User -> %v", User)
 	//insert in mongoDB
-	_, err = Collection_Main.InsertOne(context.Background(), User)
+	_, err = Collection_Main.InsertOne(context.TODO(), User)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -132,6 +161,18 @@ func (s *service) InsertUser(User model.Users, c *gin.Context) {
 }
 
 func (s *service) GetUsers(c *gin.Context) map[string]interface{} {
+
+	// token, exists := c.Get("token")
+
+	// if !exists {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not found"})
+	// 	return map[string]interface{}{
+	// 		"error": "Unauthorized Access",
+	// 	}
+	// }
+
+	// err := utils.VerifyToken(string(token))
+
 	var users []model.Users
 
 	cursor, err := Collection_Main.Find(context.TODO(), bson.D{})
