@@ -108,6 +108,7 @@ func (s *service) LoginUser(User model.Users, c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User Logged In Successfully",
 		"user":    temp,
+		"token":   token,
 	})
 }
 
