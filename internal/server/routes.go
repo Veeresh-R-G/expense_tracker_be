@@ -29,7 +29,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 
 	r.Use(corsMiddleware())
-	r.Use(middleware.JWTMiddleware)
+	r.Use(middleware.JWTMiddleware())
 	r.GET("/", s.HelloWorldHandler)
 	r.GET("/health", s.healthHandler)
 	r.GET("/getAllUsers", s.FindAllUsers)
