@@ -226,7 +226,6 @@ func (s *service) UpdateTotalAmount(User *model.Users, c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Total amount updated successfully",
 	})
-
 }
 
 func (s *service) UpdateDailySpends(User *model.Users, c *gin.Context) {

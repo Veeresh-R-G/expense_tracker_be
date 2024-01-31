@@ -13,6 +13,7 @@ import (
 var secretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 
 func CreateToken(username string, uuid string) (string, error) {
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"authorized": true,
@@ -21,6 +22,7 @@ func CreateToken(username string, uuid string) (string, error) {
 			"exp":        time.Now().Add(time.Hour * 24).Unix(),
 		})
 
+	fmt.Printf("Token == %v\n%s\n", token, secretKey)
 	tokenString, err := token.SignedString(secretKey)
 
 	if err != nil {
@@ -44,6 +46,20 @@ func VerifyToken(tokenString string) error {
 		return fmt.Errorf("invalid token")
 	}
 
+	return nil
+}
+
+func TokenValid(c *gin.Context) error {
+	tokenString := ExtractToken(c)
+	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

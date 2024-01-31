@@ -1,6 +1,7 @@
 package server
 
 import (
+	"backend/middleware"
 	"backend/model"
 	helper "backend/utils"
 	"fmt"
@@ -26,7 +27,9 @@ func corsMiddleware() gin.HandlerFunc {
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
+
 	r.Use(corsMiddleware())
+	r.Use(middleware.JWTMiddleware)
 	r.GET("/", s.HelloWorldHandler)
 	r.GET("/health", s.healthHandler)
 	r.GET("/getAllUsers", s.FindAllUsers)
