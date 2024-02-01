@@ -117,39 +117,36 @@ func (s *service) InsertUser(User model.Users, c *gin.Context) {
 	var temp model.Users
 	filter := bson.D{{Key: "email", Value: User.Email}}
 	err := Collection_Main.FindOne(context.TODO(), filter).Decode(&temp)
-	fmt.Println("Here I am")
+
 	if err == nil {
 		c.JSON(http.StatusAlreadyReported, gin.H{
 			"message": "User already exists",
 		})
 		return
 	}
-	fmt.Println("Here I am")
 
 	filter = bson.D{{Key: "username", Value: User.Username}}
 	err = Collection_Main.FindOne(context.TODO(), filter).Decode(&temp)
-	fmt.Println("Here I am")
+
 	if err == nil {
 		c.JSON(http.StatusAlreadyReported, gin.H{
 			"message": "Username already Taken!!",
 		})
 		return
 	}
-	fmt.Println("Here I am")
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(User.Password), bcrypt.DefaultCost)
-	fmt.Println("Here I am")
+
 	if err != nil {
 		c.JSON(http.StatusConflict, gin.H{
 			"message": "Error in Password Hashing",
 		})
 		return
 	}
-	fmt.Println("Here I am")
+
 	User.UUID = uuid.NewString()
 	User.Password = string(hashedPassword)
 
-	fmt.Printf("User -> %v", User)
 	//insert in mongoDB
 	_, err = Collection_Main.InsertOne(context.TODO(), User)
 	if err != nil {
@@ -240,7 +237,6 @@ func (s *service) UpdateDailySpends(User *model.Users, c *gin.Context) {
 
 	filter := bson.D{{Key: "uuid", Value: User.UUID}}
 	newSpends := append(tempUser.Spends, User.Spends...)
-	fmt.Printf("new%+v", newSpends)
 	update := bson.D{{Key: "$set", Value: bson.D{{Key: "spends", Value: newSpends}}}}
 
 	_, err = Collection_Main.UpdateOne(context.TODO(), filter, update)

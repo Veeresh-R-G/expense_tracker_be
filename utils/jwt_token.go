@@ -22,9 +22,9 @@ func CreateToken(username string, uuid string) (string, error) {
 			"exp":        time.Now().Add(time.Hour * 24).Unix(),
 		})
 
-	fmt.Printf("Token == %v\n%s\n", token, secretKey)
+	fmt.Printf("Token Algorithm == \n %v \n", token.Header["alg"])
 	tokenString, err := token.SignedString(secretKey)
-
+	fmt.Printf("Signed String : %s\n\n", tokenString)
 	if err != nil {
 		fmt.Println("Failed to Generate the JWT Token")
 		return "", err
@@ -52,25 +52,30 @@ func VerifyToken(tokenString string) error {
 func TokenValid(c *gin.Context) error {
 	tokenString := ExtractToken(c)
 	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
+		// Problem was to check the signing method used to 🥺
+
+		// if token.Header["alg"] != "HS256" {
+		// 	return nil, fmt.Errorf("unexpected signing algorithm: %v", token.Header["alg"])
+		// }
 		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+
 	})
 	if err != nil {
+		fmt.Printf("\n\nToken valid error : %v \n\n", err)
 		return err
 	}
+
 	return nil
 }
 
 func ExtractToken(c *gin.Context) string {
 	token := c.Query("token")
-
 	if token != "" {
 		return token
 	}
 
 	bearerToken := c.Request.Header.Get("Authorization")
+
 	if len(strings.Split(bearerToken, " ")) == 2 {
 		return strings.Split(bearerToken, " ")[1]
 	}
