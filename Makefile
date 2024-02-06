@@ -3,10 +3,21 @@
 # Build the application
 all: build
 
+buildserverLess:
+	set GOARCH=amd64 
+	set GOOS=linux 
+	go build -ldflags="-s -w" -o bin/main cmd/api/main.go
+
+deploy-prod:
+	serverless deploy --stage prod --aws-profile Go-serverless-lambda
+
+
 build:
-	@echo "Building..."
+	@echo "Start Building..."
 	
 	@go build -o main cmd/api/main.go
+
+	@echo "Building..."
 
 # Run the application
 run:
